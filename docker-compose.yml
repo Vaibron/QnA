@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     container_name: qna-app
@@ -15,6 +13,17 @@ services:
         condition: service_healthy
     volumes:
       - .:/app
+    command: >
+      sh -c "
+      echo 'Ожидание базы...';
+      until pg_isready -h \$DB_HOST -U \$DB_USER -d \$DB_NAME; do
+        sleep 2;
+      done;
+      echo 'Применяем миграции...';
+      alembic upgrade head;
+      echo 'Запуск приложения...';
+      python main.py
+      "
     networks:
       - qna-network
 
