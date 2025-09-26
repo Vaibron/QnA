@@ -16,13 +16,13 @@ services:
     command: >
       sh -c "
       echo 'Ожидание базы...';
-      until pg_isready -h \$DB_HOST -U \$DB_USER -d \$DB_NAME; do
+      until pg_isready -h $$DB_HOST -U $$DB_USER -d $$DB_NAME; do
         sleep 2;
       done;
       echo 'Применяем миграции...';
       alembic upgrade head;
       echo 'Запуск приложения...';
-      python main.py
+      exec uvicorn main:app --host 0.0.0.0 --port 8000
       "
     networks:
       - qna-network
