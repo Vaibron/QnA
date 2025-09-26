@@ -3,7 +3,8 @@ from fastapi import APIRouter, HTTPException, Depends, status, Body
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from apps.auth.schemas import UserCreate, Token, UserUpdate, PasswordChange, RefreshToken
-from apps.auth.crud import get_user_by_email, create_user, update_user, change_password, create_verification_token, verify_user_email
+from apps.auth.crud import get_user_by_email, create_user, update_user, change_password, create_verification_token, \
+    verify_user_email
 from apps.auth.utils import verify_password, create_access_token, create_refresh_token  # Импорт утилит
 from apps.auth.models import User
 from core.dependencies import get_db
@@ -17,7 +18,9 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["Авторизация"])
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)  # auto_error=False делает заголовок необязательным
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login",
+                                     auto_error=False)  # auto_error=False делает заголовок необязательным
+
 
 async def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
     """Получает пользователя по JWT-токену."""
@@ -53,6 +56,7 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: As
         raise HTTPException(status_code=401, detail="Email не подтверждён")
     logger.debug(f"Пользователь успешно аутентифицирован: {email}")
     return user
+
 
 @router.post("/register", response_model=Token, summary="Регистрация")
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
@@ -103,6 +107,7 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
         logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Внутренняя ошибка сервера: {str(e)}")
 
+
 @router.get("/verify", summary="Подтверждение email")
 async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
     """Подтверждает email по токену."""
@@ -113,6 +118,7 @@ async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Недействительный или истёкший токен подтверждения")
     logger.info(f"Email успешно подтверждён: {user.email}")
     return {"message": "Email успешно подтверждён"}
+
 
 @router.post("/login", response_model=Token, summary="Вход")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
@@ -147,6 +153,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
         logger.error(f"Ошибка в login: {str(e)}")
         logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Внутренняя ошибка сервера: {str(e)}")
+
 
 @router.post("/refresh", response_model=Token, summary="Обновление токенов")
 async def refresh_token(
@@ -208,6 +215,7 @@ async def refresh_token(
         "user_id": user.id
     }
 
+
 @router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT, summary="Удаление пользователя")
 async def delete_user(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     """Удаляет учетную запись пользователя."""
@@ -222,30 +230,6 @@ async def delete_user(current_user: User = Depends(get_current_user), db: AsyncS
         logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Внутренняя ошибка сервера: {str(e)}")
 
-@router.post("/create-superuser", response_model=Token, summary="Создание суперпользователя")
-async def create_superuser(user: UserCreate, db: AsyncSession = Depends(get_db)):
-    """Создает суперпользователя."""
-    logger.debug(f"Создание суперпользователя: {user.email}")
-    if await get_user_by_email(db, user.email):
-        logger.warning(f"Попытка создания суперпользователя с занятым email: {user.email}")
-        raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
-    db_user, verification_token = await create_user(db, user)
-    db_user.is_superuser = True
-    await db.commit()
-    await db.refresh(db_user)
-    logger.info(f"Суперпользователь успешно создан: {db_user.email}")
-    access_token = create_access_token(
-        data={"sub": db_user.email},
-        expires_delta=timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
-    refresh_token = create_refresh_token(data={"sub": db_user.email})
-    logger.debug(f"Токены созданы для суперпользователя: {db_user.email}")
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "token_type": "bearer",
-        "user_id": db_user.id
-    }
 
 @router.put("/update", summary="Обновление профиля")
 async def update_profile(
@@ -271,6 +255,7 @@ async def update_profile(
         logger.error(f"Ошибка в update_profile: {str(e)}")
         logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Внутренняя ошибка сервера: {str(e)}")
+
 
 @router.put("/change-password", summary="Смена пароля")
 async def change_user_password(
