@@ -30,16 +30,17 @@ FastAPI-сервис для системы вопросов и ответов (Q
 QnA/
 ├── apps/
 │   ├── auth/           # Аутентификация и пользователи
-│   ├── qna/           # Вопросы и ответы
-│   └── admin/         # Панель администратора
-├── core/              # Базовая конфигурация и утилиты
-├── tests/             # Тесты
-├── alembic/           # Миграции базы данных
-├── requirements.txt   # Зависимости
-├── docker-compose.yml # Docker Compose
-├── Dockerfile        # Docker образ
-├── init_superuser.py # Создание суперпользователя
-└── main.py           # Точка входа
+│   ├── qna/            # Вопросы и ответы
+│   └── admin/          # Панель администратора
+├── core/               # Базовая конфигурация и утилиты
+├── tests/              # Тесты
+├── alembic/            # Миграции базы данных
+├── requirements.txt    # Зависимости
+├── .env                # Файл конфигурации
+├── docker-compose.yml  # Docker Compose
+├── Dockerfile          # Docker образ
+├── init_superuser.py   # Создание суперпользователя
+└── main.py             # Точка входа
 ```
 
 ## 🚀 Быстрый запуск
