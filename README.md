@@ -116,21 +116,8 @@ python init_superuser.py
 ### 5. Остановка контейнеров проекта
 
 ```bash
-# Остановка контейнеров (без удаления)
+# Остановка контейнеров qna-app и qna-db
 sudo docker compose stop qna-app qna-db
-
-# Остановка контейнеров и удаление 
-sudo docker compose down qna-app qna-db
-```
-
-### 6. Полное удаление образов и контейнеров проекта
-
-```bash
-# Удаление контейнеров qna-app и qna-db
-sudo docker rm -f $(sudo docker ps -a -q --filter "name=qna-app" --filter "name=qna-db")
-
-# Удаление образов qna-app и postgres:15
-sudo docker rmi -f $(sudo docker images -q qna-app postgres:15)
 ```
 
 ## 📚 API Endpoints
