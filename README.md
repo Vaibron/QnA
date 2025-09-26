@@ -279,8 +279,8 @@ sudo docker compose ps
 
 ### Просмотр логов конкретного сервиса
 ```bash
-sudo docker compose logs web -f
-sudo docker compose logs db -f
+sudo docker compose logs qna-app -f
+sudo docker compose logs qna-db -f
 ```
 
 ### Остановка и запуск сервисов
@@ -292,5 +292,5 @@ sudo docker compose stop
 sudo docker compose start
 
 # Перезагрузка конкретного сервиса
-sudo docker compose restart web
+sudo docker compose restart qna-app
 ```
